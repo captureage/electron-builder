@@ -338,7 +338,7 @@ export class WinPackager extends PlatformPackager<WindowsConfiguration> {
     }
 
     return file => {
-      if (file.endsWith(".exe") || (this.isSignDlls() && file.endsWith(".dll"))) {
+      if (file.endsWith(".exe") || (this.isSignDlls() && file.endsWith(".dll")) || file.endsWith(".node")) {
         const parentDir = path.dirname(file)
         if (parentDir !== packContext.appOutDir) {
           return new CopyFileTransformer(file => this.sign(file))
@@ -358,7 +358,7 @@ export class WinPackager extends PlatformPackager<WindowsConfiguration> {
       if (file === exeFileName) {
         return this.signAndEditResources(path.join(packContext.appOutDir, exeFileName), packContext.arch, packContext.outDir, path.basename(exeFileName, ".exe"), this.platformSpecificBuildOptions.requestedExecutionLevel)
       }
-      else if (file.endsWith(".exe") || (this.isSignDlls() && file.endsWith(".dll"))) {
+      else if (file.endsWith(".exe") || (this.isSignDlls() && file.endsWith(".dll")) || file.endsWith(".node")) {
         return this.sign(path.join(packContext.appOutDir, file))
       }
       return null
@@ -370,7 +370,7 @@ export class WinPackager extends PlatformPackager<WindowsConfiguration> {
 
     const outResourcesDir = path.join(packContext.appOutDir, "resources", "app.asar.unpacked")
     // noinspection JSUnusedLocalSymbols
-    const fileToSign = await walk(outResourcesDir, (file, stat) => stat.isDirectory() || file.endsWith(".exe") || (this.isSignDlls() && file.endsWith(".dll")))
+    const fileToSign = await walk(outResourcesDir, (file, stat) => stat.isDirectory() || file.endsWith(".exe") || (this.isSignDlls() && (file.endsWith(".dll")) || file.endsWith(".node")))
     await BluebirdPromise.map(fileToSign, file => this.sign(file), {concurrency: 4})
   }
 }
